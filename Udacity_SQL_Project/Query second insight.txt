@@ -1,0 +1,23 @@
+/* query used for second insight */
+
+WITH t1 AS (SELECT c.name AS category_name,
+                   f.title AS film_title,
+                   COUNT (*) OVER (PARTITION BY f.title ORDER BY c.name) AS r_count
+            FROM category AS c
+            JOIN film_category AS cg
+            ON c.category_id = cg.category_id
+            JOIN film AS f
+            ON f.film_id = cg.film_id
+            JOIN inventory AS i
+            ON i.film_id = f.film_id
+            JOIN rental AS r
+            ON r.inventory_id = i.inventory_id
+           )
+
+SELECT t1.category_name,
+       t1.film_title,
+       COUNT (t1.r_count) AS rental_count
+FROM t1
+WHERE t1.category_name IN ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music')
+GROUP BY 1,2
+ORDER BY 1, 2,3 DESC

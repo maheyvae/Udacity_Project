@@ -1,0 +1,21 @@
+/*Query 1 - query used for first insight*/
+
+WITH t1 AS (SELECT
+                   p.customer_id AS customer_id,
+                   SUM (p.amount) AS pay_amount
+            FROM payment AS p
+            GROUP BY 1
+            ORDER BY 2 DESC
+            LIMIT 10)
+
+SELECT DATE_TRUNC ('month', p.payment_date) AS pay_month,
+       c.first_name || ' ' || c.last_name AS full_name,
+       COUNT (*) AS pay_count,
+       SUM(p.amount) AS pay_amount
+FROM t1
+JOIN customer  AS c
+ON c.customer_id = t1.customer_id
+JOIN payment  AS p
+ON p.customer_id = c.customer_id
+GROUP BY 1,2
+ORDER BY 2,1

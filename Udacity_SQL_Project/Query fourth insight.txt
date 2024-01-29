@@ -1,0 +1,25 @@
+/* Query fourth insight */
+
+WITH t1 AS
+        (SELECT f.film_id AS film_id,
+               f.title AS film_title,
+               COUNT (*) AS rental_count
+        FROM film AS f
+        JOIN inventory AS I
+        ON f.film_id = i.film_id
+        JOIN rental AS r
+        ON i.inventory_id = r.inventory_id
+        GROUP BY 1,2
+        ORDER BY 3 DESC
+        LIMIT 3)
+
+SELECT t1.film_title AS film_title,
+       SUM (p.amount) AS total_pay_amount
+FROM t1
+JOIN inventory AS i
+ON t1.film_id = i.film_id
+JOIN rental AS r
+ON i.inventory_id = r.inventory_id
+JOIN payment AS p
+ON r.rental_id = p.rental_id
+GROUP BY 1
